@@ -1,6 +1,6 @@
 class Balle:
     """Modelisation de la balle du jeu"""
-    def __init__(self, rayon:int, couleur:str, position_0:tuple, vitesse=10):
+    def __init__(self, rayon:int, couleur:str, position_0:tuple, vitesse=(10, 10)):
         """
             Initialise les variables liées à la balle.
             :param rayon: (int) le rayon de la balle
@@ -10,8 +10,9 @@ class Balle:
             :CU : None
         """
         self.position_balle_x, self.position_balle_y = position_0
-        self.vitesse = vitesse
+        self.vitesse_x, self.vitesse_y = vitesse
         self.rayon = rayon
+        self.couleur_balle = couleur
 
     def move_y(self, vitesse):
         """
