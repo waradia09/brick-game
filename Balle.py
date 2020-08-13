@@ -9,10 +9,10 @@ class Balle:
             :return : (None)
             :CU : None
         """
-        self.position_balle_x, self.position_balle_y = position_0
+        self.position_x, self.position_y = position_0
         self.vitesse_x, self.vitesse_y = vitesse
         self.rayon = rayon
-        self.couleur_balle = couleur
+        self.color = couleur
 
     def move_y(self, vitesse):
         """
@@ -22,7 +22,7 @@ class Balle:
             :CU: aucun
         """
 
-        self.position_balle_y += vitesse
+        self.position_y += vitesse
 
     def move_x(self, vitesse):
         """
@@ -31,5 +31,5 @@ class Balle:
             :return : (None)
             :CU: aucun
         """
-        self.position_balle_x += vitesse
+        self.position_x += vitesse
 

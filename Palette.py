@@ -4,24 +4,23 @@ class Palette:
     def __init__(self, longueur:int, couleur:str, position:tuple, vitesse:int):
         self._longueur_normale = longueur
         self.longueur = longueur
-        self.position_palette_x, self.position_palette_y = position
-        self.position_palette_x -= longueur // 2 # permet de centrer
+        self.position_x, self.position_y = position
         self.vitesse = vitesse
-        self.color_palette = couleur
+        self.color = couleur
 
     def move_right(self):
         """
             Allow the palette to move toward right
             :return:
         """
-        self.position_palette_x += self.vitesse
+        self.position_x += self.vitesse
 
     def move_left(self):
         """
             Allow the palette to move toward left
             :return: (None)
         """
-        self.position_palette_x -= self.vitesse
+        self.position_x -= self.vitesse
 
     def evoluer(self, taille_plus:int):
         """
@@ -43,3 +42,7 @@ class Palette:
             :return: (None)
         """
         self.longueur = self._longueur_normale
+
+if __name__ == "__main__":
+    palette = Palette(50, (0, 0, 0), (250, 485), 10)
+    print(palette.position_x, palette.position_y)

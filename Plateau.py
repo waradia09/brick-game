@@ -1,19 +1,20 @@
-import pygame, sys
+import pygame, sys, time
 
 
 class Plateau:
 	""" Modelisation de la fenetre du jeu """
-	def __init__(self, dimension:tuple, background_color:str, palette1, balle1, title="Brick game"):
+	def __init__(self, dimension:tuple, background_color:str, palette, balle, title="Brick game"):
 		
 		### caracteristiques de la fenetre
-		self.taille_fenetre_x, self.taille_fenetre_y = dimension
+		self.taille_x, self.taille_y = dimension
 			# Graphique
 		self.screen = pygame.display.set_mode(dimension)
 		pygame.display.set_caption(title)
  		
 		### Gestion du Jeu
-		self.game_over = False
 		self.est_lancee_balle = False
+		self.est_tombe_balle = False
+		self.score = 0
 
 		## composant palette
 
@@ -22,7 +23,7 @@ class Plateau:
 
 		### reaction infinie au maintient d'une touche
 		pygame.key.set_repeat(1,20)
-		while True:
+		while not self.est_tombe_balle:
 			pygame.display.flip()
 			self.screen.fill(background_color)
 			for event in pygame.event.get():
@@ -32,15 +33,15 @@ class Plateau:
 
 					### Gestion du deplacement de la palette 
 					# J'avoue avoir fait un peu de bricolage sur ces conditions, pour le moment elles marchent bien
-					ne_sortira_pas_à_droite = palette1.position_palette_x + palette1.longueur + palette1.vitesse <= self.taille_fenetre_x
-					ne_sortira_pas_à_gauche = 0 <= palette1.position_palette_x - palette1.longueur//2 + palette1.vitesse
+					ne_sortira_pas_à_droite = palette.position_x + palette.vitesse <= self.taille_x - palette.longueur //2
+					ne_sortira_pas_à_gauche = palette.position_x + palette.vitesse >= palette.longueur // 2
 					
 					if event.key == pygame.K_RIGHT:
 						if ne_sortira_pas_à_droite:
-							palette1.move_right()
+							palette.move_right()
 					elif event.key == pygame.K_LEFT:
 						if ne_sortira_pas_à_gauche:
-							palette1.move_left()
+							palette.move_left()
 
 					### Gestion du mouvement de la balle
 					elif event.key == pygame.K_SPACE :
@@ -48,59 +49,72 @@ class Plateau:
 						
 
 			### Gestion du mouvement de la balle	
-			if self.est_lancee_balle:
-				position_x = balle1.position_balle_x #+ balle1.rayon
-				position_y = balle1.position_balle_y #+ balle1.rayon
-				
+			if self.est_lancee_balle:				
 				# la balle chage de direction x, si elle tape les bords
-				if balle1.rayon >= position_x or position_x >= self.taille_fenetre_x - balle1.rayon:
-					balle1.vitesse_x = - balle1.vitesse_x
+				if balle.position_x - balle.rayon <= 0  or balle.position_x + balle.rayon >=  self.taille_x:
+					balle.vitesse_x = - balle.vitesse_x
 
 				# elle chage de direction y s'il elle tape le bord superieur ou la palette
-				tape_bord_superieur = balle1.rayon >= position_y
-				tappe_palette = balle1.position_balle_y + balle1.rayon == self.taille_fenetre_y - balle1.rayon and palette1.position_palette_x - palette1.longueur <= balle1.position_balle_x <= palette1.position_palette_x + palette1.longueur
+				tape_bord_superieur = balle.position_y - balle.rayon <= 0
+				tappe_palette = balle.position_y + balle.rayon == palette.position_y and  (balle.position_x - palette.position_x + balle.rayon <= abs(palette.longueur//2) or balle.position_x - palette.position_x - balle.rayon <= abs(palette.longueur//2) )
 				if tape_bord_superieur or tappe_palette:
-					balle1.vitesse_y = - balle1.vitesse_y
+					balle.vitesse_y = - balle.vitesse_y
+				elif balle.position_y + balle.rayon == self.taille_y - balle.rayon and not palette.position_x - palette.longueur <= balle.position_x <= palette.position_x + palette.longueur:
+					self.est_tombe_balle = True
+					print(self.score)
+					sys.exit()
 
-				balle1.move_y(balle1.vitesse_y)
-				balle1.move_x(balle1.vitesse_x)
+
+				if tappe_palette:
+					self.score += 1
+
+				balle.move_y(balle.vitesse_y)
+				balle.move_x(balle.vitesse_x)
 				
-				print(palette1.position_palette_x, palette1.position_palette_x)
+				
 				
 
-				time.sleep(0.1)
+				time.sleep(0.01 )
 
 			
 
 			## dessin de la palette sur la fenetre
-			pygame.draw.rect(self.screen, palette1.color_palette, 
-				(palette1.position_palette_x, palette1.position_palette_y, palette1.longueur, 5))
+			pygame.draw.rect(self.screen, palette.color, 
+				((palette.position_x - palette.longueur//2, palette.position_y), (palette.longueur, 5)))
 
 			## Dessin de la balle sur la fenetre
-			pygame.draw.circle(self.screen, balle1.couleur_balle, (balle1.position_balle_x, balle1.position_balle_y), balle1.rayon)
+			pygame.draw.circle(self.screen, balle.color, (balle.position_x, balle.position_y), balle.rayon)
 			
-			#print(palette1.position_palette_x, palette1.position_palette_y)
+			print(palette.position_x, palette.position_x, balle.position_x ) # debogage
 			
 
 
 if __name__ == "__main__":
-	"""
-		Debogage 
-	"""
-	import time
-	###
-	from Palette import *
+	from Jeu import *
+	from Plateau import *
 	from Balle import *
-	# color 
+	from Palette import *
+	import time
+
+	### variable d'initialisation
+	# Couleur
 	color_white = (255, 255, 255)
 	color_blue = (0, 0, 255)
 	color_red = (255, 0, 0)
+	color_black = (0, 0, 0)
+	# dimension ecran
+	dim_ecran = (500, 500)
+
+	# dimension pallete
+	l_palette = 50
+	x_palette = dim_ecran[0] // 2
+	y_palette = dim_ecran[1] - 15
 
 	# creation d'un objet palette
-	palette1 = Palette(50, color_blue, (250, 485), 10)
-	# creation d'un objet balle
-	balle1 = Balle(rayon = 10, couleur = color_red, position_0 = (250, 100), vitesse=(10, 10))
-
 	
-	Plateau((500, 500), color_white, palette1, balle1)
+	palette = Palette(l_palette, color_black, (x_palette, y_palette), 2)
+	# creation d'un objet balle
+	balle = Balle(rayon = 10, couleur = color_red, position_0 = (250, 100), vitesse=(1, 1))
+	# creation d'un objet plateau
+	Plateau(dim_ecran, color_white, palette, balle)
 	pygame.init()
