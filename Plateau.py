@@ -56,7 +56,7 @@ class Plateau:
 
 				# elle chage de direction y s'il elle tape le bord superieur ou la palette
 				tape_bord_superieur = balle.position_y - balle.rayon <= 0
-				tappe_palette = balle.position_y + balle.rayon == palette.position_y and  (balle.position_x - palette.position_x + balle.rayon <= abs(palette.longueur//2) or balle.position_x - palette.position_x - balle.rayon <= abs(palette.longueur//2) )
+				tappe_palette = balle.position_y + balle.rayon == palette.position_y and  (abs(balle.position_x - palette.position_x + balle.rayon) <= abs(palette.longueur//2) or abs(balle.position_x - palette.position_x - balle.rayon) <= abs(palette.longueur//2) )
 				if tape_bord_superieur or tappe_palette:
 					balle.vitesse_y = - balle.vitesse_y
 				elif balle.position_y + balle.rayon == self.taille_y - balle.rayon and not palette.position_x - palette.longueur <= balle.position_x <= palette.position_x + palette.longueur:
@@ -103,7 +103,7 @@ if __name__ == "__main__":
 	color_red = (255, 0, 0)
 	color_black = (0, 0, 0)
 	# dimension ecran
-	dim_ecran = (500, 500)
+	dim_ecran = (500, 300)
 
 	# dimension pallete
 	l_palette = 50
@@ -112,9 +112,9 @@ if __name__ == "__main__":
 
 	# creation d'un objet palette
 	
-	palette = Palette(l_palette, color_black, (x_palette, y_palette), 2)
+	palette = Palette(l_palette, color_blue, (x_palette, y_palette), 2)
 	# creation d'un objet balle
 	balle = Balle(rayon = 10, couleur = color_red, position_0 = (250, 100), vitesse=(1, 1))
 	# creation d'un objet plateau
-	Plateau(dim_ecran, color_white, palette, balle)
+	Plateau(dim_ecran, color_black, palette, balle)
 	pygame.init()
